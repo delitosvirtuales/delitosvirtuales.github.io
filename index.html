@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bliss — dev / ex black hat</title>
+<meta name="description" content="Bliss — black hat de joven, red hat ahora. Python, Termux, bots, recon y crypto, sin careteo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#121210;
+    --bg-alt:#1b1b18;
+    --card:#181815;
+    --fg:#ece7d8;
+    --fg-dim:#8f8b7d;
+    --pink:#ff2f7e;
+    --yellow:#e7b400;
+    --green:#78d67e;
+    --line:#38362e;
+    --radius:2px;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --display: 'Archivo Black', var(--mono);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:var(--mono);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* textura de grano, sutil, para que no se sienta plancha */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:2;
+    opacity:.045;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+
+  ::selection{background:var(--pink);color:#0e0e0c;}
+
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible{
+    outline:2px solid var(--yellow);
+    outline-offset:3px;
+  }
+
+  .wrap{
+    width:min(1040px, 100% - 2.5rem);
+    margin-inline:auto;
+  }
+
+  .eyebrow{
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--fg-dim);
+  }
+  .eyebrow::before{content:"// ";color:var(--pink);}
+
+  /* ---------- NAV ---------- */
+  header.site{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:rgba(18,18,16,.86);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:.9rem 0;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+  .brand{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:.95rem;
+    white-space:nowrap;
+  }
+  .brand .p{color:var(--green);}
+  .brand .cursor{
+    display:inline-block;
+    width:.55em;
+    background:var(--yellow);
+    margin-left:.15em;
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  .nav ul{
+    list-style:none;
+    display:flex;
+    gap:1.4rem;
+    margin:0;
+    padding:0;
+    font-size:.82rem;
+    flex-wrap:wrap;
+  }
+  .nav a{
+    text-decoration:none;
+    color:var(--fg-dim);
+    position:relative;
+    padding-bottom:2px;
+  }
+  .nav a::before{content:"$ ";color:var(--pink);}
+  .nav a:hover{color:var(--fg);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:4.5rem 0 3.5rem;
+  }
+  .term{
+    background:var(--bg-alt);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    position:relative;
+    margin-top:1.4rem;
+  }
+  .term-tab{
+    position:absolute;
+    top:-11px;
+    left:18px;
+    background:var(--pink);
+    color:#170a10;
+    font-size:.68rem;
+    font-weight:700;
+    letter-spacing:.06em;
+    padding:.15rem .55rem;
+    border-radius:1px;
+    transform:rotate(-1.5deg);
+  }
+  .term-body{
+    padding:1.6rem 1.4rem 1.8rem;
+    font-size:.86rem;
+    overflow-x:auto;
+  }
+  .term-line{color:var(--fg-dim); white-space:pre;}
+  .term-line .k{color:var(--green);}
+  .term-line .v{color:var(--fg);}
+  .term-prompt{color:var(--yellow);}
+  .term-cursor{
+    display:inline-block;
+    width:.5em;
+    height:1em;
+    background:var(--fg);
+    vertical-align:text-bottom;
+    animation:blink 1s steps(1) infinite;
+  }
+
+  h1.title{
+    font-family:var(--display);
+    font-size:clamp(2.4rem, 8vw, 4.6rem);
+    line-height:.94;
+    margin:1.6rem 0 .6rem;
+    text-transform:uppercase;
+    letter-spacing:-.01em;
+  }
+  h1.title .hl{
+    position:relative;
+    color:var(--bg);
+    -webkit-text-stroke:0;
+    background:var(--pink);
+    padding:0 .12em;
+    display:inline-block;
+    transform:rotate(-1deg);
+  }
+  .tagline{
+    font-size:clamp(.95rem, 2.4vw, 1.15rem);
+    color:var(--fg-dim);
+    max-width:46ch;
+    margin:0 0 1.8rem;
+  }
+  .tagline strong{color:var(--fg); font-weight:700;}
+
+  .cta-row{display:flex; gap:.9rem; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--mono);
+    font-size:.82rem;
+    font-weight:700;
+    text-decoration:none;
+    padding:.75rem 1.1rem;
+    border:1px solid var(--fg);
+    border-radius:var(--radius);
+    color:var(--fg);
+    transition:background .15s ease, color .15s ease, transform .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn.primary{background:var(--fg); color:var(--bg);}
+  .btn.primary:hover{background:var(--yellow); border-color:var(--yellow);}
+  .btn.ghost:hover{border-color:var(--pink); color:var(--pink);}
+
+  /* ---------- SECTION SHELL ---------- */
+  section{padding:3.4rem 0;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:1rem;
+    margin-bottom:1.6rem;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:.8rem;
+  }
+  .section-head h2{
+    font-family:var(--display);
+    font-size:clamp(1.4rem, 4vw, 2rem);
+    text-transform:uppercase;
+    margin:0;
+  }
+  .count{color:var(--fg-dim); font-size:.78rem;}
+
+  /* ---------- SKILLS ---------- */
+  .pkg-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+    gap:.6rem;
+    list-style:none;
+    margin:0;
+    padding:0;
+    font-size:.82rem;
+  }
+  .pkg-list li{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:.6rem .75rem;
+    display:flex;
+    justify-content:space-between;
+    gap:.5rem;
+  }
+  .pkg-list li .name{color:var(--fg);}
+  .pkg-list li .ver{color:var(--green);}
+
+  /* ---------- PROJECTS ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(270px, 1fr));
+    gap:1.1rem;
+  }
+  .grid-single{
+    grid-template-columns:minmax(270px, 360px);
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.3rem 1.3rem 1.5rem;
+    display:flex;
+    flex-direction:column;
+    gap:.7rem;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .card:hover{border-color:var(--pink); transform:translateY(-3px);}
+  .card .status{
+    font-size:.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    width:fit-content;
+    padding:.15rem .5rem;
+    border-radius:1px;
+  }
+  .status.live{background:rgba(120,214,126,.15); color:var(--green); border:1px solid var(--green);}
+  .status.wip{background:rgba(231,180,0,.15); color:var(--yellow); border:1px solid var(--yellow);}
+  .card h3{
+    margin:0;
+    font-family:var(--mono);
+    font-size:1.05rem;
+    font-weight:700;
+  }
+  .card p{margin:0; color:var(--fg-dim); font-size:.87rem;}
+  .stack{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem;
+    margin-top:.2rem;
+  }
+  .stack span{
+    font-size:.68rem;
+    color:var(--fg-dim);
+    border:1px solid var(--line);
+    padding:.15rem .45rem;
+    border-radius:1px;
+  }
+  .card a.repo{
+    margin-top:auto;
+    font-size:.8rem;
+    font-weight:700;
+    color:var(--pink);
+    text-decoration:none;
+  }
+  .card a.repo:hover{text-decoration:underline;}
+
+  /* ---------- ABOUT ---------- */
+  .about p{
+    max-width:64ch;
+    color:var(--fg-dim);
+    font-size:.95rem;
+  }
+  .about strong{color:var(--fg);}
+  .about .quote{
+    border-left:2px solid var(--pink);
+    padding-left:1rem;
+    color:var(--fg);
+    font-style:normal;
+    margin:1.4rem 0;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:2.4rem 0 3rem;
+  }
+  .foot-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:1.5rem;
+  }
+  .foot-links{
+    list-style:none;
+    display:flex;
+    gap:1.2rem;
+    padding:0;
+    margin:0;
+    flex-wrap:wrap;
+    font-size:.85rem;
+  }
+  .foot-links a{text-decoration:none; color:var(--fg-dim);}
+  .foot-links a:hover{color:var(--pink);}
+  .comment{color:var(--fg-dim); font-size:.72rem;}
+
+  @media (max-width:560px){
+    .nav{flex-direction:column; align-items:flex-start;}
+    .foot-row{flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <nav class="nav wrap">
+    <div class="brand"><span class="p">bliss@</span>github<span class="cursor">&nbsp;</span></div>
+    <ul>
+      <li><a href="#sobre">sobre</a></li>
+      <li><a href="#recorrido">recorrido</a></li>
+      <li><a href="#proyectos">proyectos</a></li>
+      <li><a href="#contacto">contacto</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <p class="eyebrow">de la mala vida al bash · termux · python</p>
+    <h1 class="title">curtí los<br>dos lados<br><span class="hl">del código.</span></h1>
+    <p class="tagline">Me crié rompiendo lo que otro armó. <strong>Black hat</strong> en la época dura, <strong>red hat</strong> cuando entendí que se puede laburar sin mirar para atrás. Hoy Python, Termux y crypto, sin careteo.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="#proyectos">ver el laburo</a>
+      <a class="btn ghost" href="https://github.com/" target="_blank" rel="noopener">github ↗</a>
+    </div>
+
+    <div class="term">
+      <span class="term-tab">~/bliss</span>
+      <div class="term-body" id="termBody" aria-label="salida de terminal simulada">
+        <div class="term-line"><span class="term-prompt">bliss@termux</span> $ whoami</div>
+        <div class="term-line"><span class="k">alias</span>    <span class="v">bliss</span></div>
+        <div class="term-line"><span class="k">barrio</span>   <span class="v">Argentina, de abajo</span></div>
+        <div class="term-line"><span class="k">pasado</span>   <span class="v">black hat — se aprendió rompiendo</span></div>
+        <div class="term-line"><span class="k">presente</span> <span class="v">red hat — se cobra rompiendo</span></div>
+        <div class="term-line"><span class="k">moneda</span>   <span class="v">crypto, sin intermediario</span></div>
+        <div class="term-line"><span class="k">disclaimer</span> <span class="v">lo que ves acá ya está resuelto</span></div>
+        <div class="term-line"><span class="term-prompt">bliss@termux</span> $ <span class="term-cursor" aria-hidden="true"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="recorrido" class="wrap about">
+    <div class="section-head">
+      <h2>recorrido</h2>
+      <span class="count">cat historial.log</span>
+    </div>
+    <p><strong>Black hat</strong> en la etapa en la que aprendés porque no te queda otra: sin curso, sin mentor, a fuerza de romper sistemas ajenos y bancarme las consecuencias. Ahí se aprende rápido o no se aprende.</p>
+    <p class="quote">Después pasé del otro lado. <strong>Red hat</strong>: mismo ojo para encontrar la falla, pero laburando para cerrarla y no para explotarla.</p>
+    <p>En el medio, <strong>crypto</strong>: wallets, on-chain, cero bancos de por medio. Hoy eso se traduce en bots, herramientas de recon y todo lo que tenga que andar sin joder a nadie que no la esté buscando.</p>
+  </section>
+
+  <section id="proyectos" class="wrap">
+    <div class="section-head">
+      <h2>proyectos</h2>
+      <span class="count">1 repo real, sin relleno</span>
+    </div>
+    <div class="grid grid-single">
+
+      <article class="card">
+        <span class="status live">activo</span>
+        <h3>bliss-recon-toolkit</h3>
+        <p>Toolkit de reconocimiento hecho a medida: automatiza las tareas de recolección de información que antes hacía a mano, script por script.</p>
+        <div class="stack"><span>Python</span><span>Recon</span><span>OSINT</span></div>
+        <a class="repo" href="https://github.com/delitosvirtuales/bliss-recon-toolkit" target="_blank" rel="noopener">ver repo →</a>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="sobre" class="wrap about">
+    <div class="section-head">
+      <h2>sobre mí</h2>
+      <span class="count">cat sobre_mi.txt</span>
+    </div>
+    <p>No pisé un aula para esto. Aprendí <strong>Python</strong> rompiendo cosas ajenas a las 2am y buscando el traceback hasta encontrar la línea culpable. Lo que sé, lo cobré caro y lo aprendí solo.</p>
+    <p class="quote">Prefiero que ande en Termux con memoria RAM de teléfono a que se vea lindo en un slide de LinkedIn.</p>
+    <p>Argentina, de abajo · bots de Telegram · recon y crypto · deploy donde sea que no me cobren.</p>
+  </section>
+</main>
+
+<footer id="contacto">
+  <div class="wrap foot-row">
+    <div>
+      <p class="eyebrow">contacto</p>
+      <ul class="foot-links">
+        <li><a href="https://github.com/" target="_blank" rel="noopener">github</a></li>
+        <li><a href="https://t.me/" target="_blank" rel="noopener">telegram</a></li>
+        <li><a href="mailto:tu@correo.com">email</a></li>
+      </ul>
+    </div>
+    <p class="comment">// hecho a pulmón, sin plantilla ni careteo — Argentina, <span id="year"></span></p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Efecto de tipeo solo si el usuario no pidió reducir movimiento
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce){
+    const term = document.getElementById('termBody');
+    const lines = Array.from(term.children);
+    lines.forEach(l => l.style.visibility = 'hidden');
+    let i = 0;
+    function revealNext(){
+      if(i < lines.length){
+        lines[i].style.visibility = 'visible';
+        i++;
+        setTimeout(revealNext, 140);
+      }
+    }
+    revealNext();
+  }
+</script>
+
+</body>
+  </html>
+  
